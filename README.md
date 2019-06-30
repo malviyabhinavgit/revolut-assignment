@@ -21,7 +21,7 @@ Tech stack used in this project is as follows:
 Building and running application
 --------------------------------
 
-Please note: If you're on Windows, use `gradlew.bat` instead of `./gradlew` script
+
 
 To build application, execute:
 
@@ -29,12 +29,20 @@ To build application, execute:
 ./gradlew build
 ```
 
+for windows machine use
+```
+gradlew build
+```
+
 To start application, execute:
 
 ```
 ./gradlew run
 ```
-
+for windows machine use
+```
+gradlew run
+```
 ### Fat jar
 
 To generate fat jar file with all dependencies, execute:
