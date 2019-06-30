@@ -1,0 +1,106 @@
+buildscript {
+  repositories {
+    jcenter()
+  }
+  dependencies {
+    classpath 'com.github.jengelman.gradle.plugins:shadow'
+  }
+}
+
+plugins {
+  id 'java'
+  id 'idea'
+  id 'application'
+  id 'jacoco'
+  id 'checkstyle'
+  id 'findbugs'
+  id 'pmd'
+  id "net.ltgt.apt" version "0.10"
+  id 'com.github.johnrengelman.shadow' version '2.0.4'
+}
+
+group 'com.revolut'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+mainClassName = 'com.revolut.money.transfer.api.Application'
+
+sourceSets {
+  main {
+    java {
+      srcDirs 'src/main/java'
+    }
+  }
+
+  test {
+    java {
+      srcDir 'src/test/java'
+    }
+  }
+}
+
+shadowJar {
+  baseName = 'app'
+  classifier = 'all'
+  version = '1.0'
+}
+
+jacocoTestReport {
+  reports {
+    xml.enabled = true
+    html.enabled = true
+  }
+
+  afterEvaluate {
+    classDirectories = files(classDirectories.files.collect {
+      fileTree(dir: it,
+              excludes: [
+                      '**/*_Provide*/**',
+                      '**/*_Factory*/**',
+                      '**/*_MembersInjector.class',
+                      '**/*Dagger*'
+              ])
+    })
+  }
+}
+
+checkstyle {
+  toolVersion = '6.0'
+  configFile = new File(rootDir, 'checkstyle.xml')
+}
+
+tasks.withType(FindBugs) {
+  reports {
+    xml.enabled = false
+    html.enabled = true
+    reportLevel = "high"
+  }
+}
+
+test {
+  if (System.properties['test.profile'] != 'integration') {
+    exclude '**/*integration*'
+  } else {
+    exclude '**/*com/*'
+  }
+}
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  implementation 'io.javalin:javalin:2.1.1'
+  implementation 'org.slf4j:slf4j-simple:1.7.25'
+  implementation 'org.joda:joda-money:1.0.1'
+  implementation 'com.google.code.gson:gson:2.8.5'
+  implementation 'com.google.dagger:dagger:2.17'
+  apt 'com.google.dagger:dagger-compiler:2.17'
+
+  testImplementation 'junit:junit:4.12'
+  testImplementation 'com.google.truth:truth:0.42'
+  testImplementation 'org.mockito:mockito-core:2.22.0'
+  testImplementation 'io.rest-assured:rest-assured:3.1.1'
+  testImplementation 'net.jodah:concurrentunit:0.4.3'
+}
